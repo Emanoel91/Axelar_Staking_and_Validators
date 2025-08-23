@@ -268,3 +268,130 @@ with col2:
     fig_tx.update_layout(xaxis_title="Date", yaxis_title="Transactions")
     st.plotly_chart(fig_tx, use_container_width=True)
 
+# --- Row 4: New vs Returning Stakers + Weekly Volatility ---------------------------------------------------------
+
+# --- Query 1: New vs Returning Stakers
+@st.cache_data
+def load_staker_data():
+    query = """
+    WITH first_stake AS (
+        SELECT
+            delegator_address,
+            MIN(block_timestamp) AS first_stake_date
+        FROM axelar.gov.fact_staking
+        WHERE action = 'delegate' AND tx_succeeded = TRUE
+        GROUP BY 1
+    ),
+    monthly_stakes AS (
+        SELECT
+            DATE_TRUNC('month', block_timestamp) AS month,
+            delegator_address,
+            COUNT(*) AS transactions
+        FROM axelar.gov.fact_staking
+        WHERE action = 'delegate' AND tx_succeeded = TRUE
+        GROUP BY 1, 2
+    ),
+    staker_status AS (
+        SELECT
+            ws.month,
+            ws.delegator_address,
+            CASE
+                WHEN ws.month = DATE_TRUNC('month', fs.first_stake_date) THEN 'New Staker'
+                ELSE 'Returning Staker'
+            END AS staker_type,
+            ws.transactions
+        FROM monthly_stakes ws
+        JOIN first_stake fs ON ws.delegator_address = fs.delegator_address
+    )
+    SELECT
+        month as "Date",
+        staker_type as "Staker Type",
+        COUNT(DISTINCT delegator_address) AS "Staker Count"
+    FROM staker_status
+    WHERE month >= '2022-09-01'
+    GROUP BY 1, 2
+    ORDER BY 1
+    """
+    return pd.read_sql(query, conn)
+
+df_stakers = load_staker_data()
+
+# --- Query 2: Weekly Volatility
+@st.cache_data
+def load_volatility_data():
+    query = """
+    SELECT
+        DATE_TRUNC('week', block_timestamp) AS "Date",
+        round(SUM(amount/1e6)) AS "Total Staked Amount (AXL)",
+        STDDEV(SUM(amount/1e6)) OVER (
+            ORDER BY DATE_TRUNC('week', block_timestamp)
+            ROWS BETWEEN 6 PRECEDING AND CURRENT ROW
+        ) AS "Weekly Volatility"
+    FROM axelar.gov.fact_staking
+    WHERE action = 'delegate' AND tx_succeeded = TRUE 
+      AND block_timestamp::date >= '2022-09-01'
+    GROUP BY 1
+    ORDER BY 1
+    """
+    return pd.read_sql(query, conn)
+
+df_volatility = load_volatility_data()
+
+# --- Layout: Two Charts in a Row
+col1, col2 = st.columns(2)
+
+# --- Chart 1: New vs Returning Stakers
+with col1:
+    fig_stakers = px.bar(
+        df_stakers,
+        x="Date",
+        y="Staker Count",
+        color="Staker Type",
+        barmode="stack",
+        title="New and Returning Stakers Over Time",
+        color_discrete_map={
+            "Returning Staker": "blue",
+            "New Staker": "green"
+        }
+    )
+    fig_stakers.update_layout(xaxis_title="Date", yaxis_title="Staker Count")
+    st.plotly_chart(fig_stakers, use_container_width=True)
+
+# --- Chart 2: Weekly Volatility of Staking Amounts
+with col2:
+    fig_vol = go.Figure()
+
+    # Bar for Total Staked Amount
+    fig_vol.add_trace(
+        go.Bar(
+            x=df_volatility["Date"],
+            y=df_volatility["Total Staked Amount (AXL)"],
+            name="Total Staked Amount (AXL)",
+            yaxis="y1"
+        )
+    )
+
+    # Line for Weekly Volatility
+    fig_vol.add_trace(
+        go.Scatter(
+            x=df_volatility["Date"],
+            y=df_volatility["Weekly Volatility"],
+            name="Weekly Volatility",
+            mode="lines+markers",
+            line=dict(color="red", width=2),
+            yaxis="y2"
+        )
+    )
+
+    # Layout with dual y-axes
+    fig_vol.update_layout(
+        title="Weekly Volatility of Staking Amounts",
+        xaxis=dict(title="Date"),
+        yaxis=dict(title="Total Staked Amount (AXL)", side="left"),
+        yaxis2=dict(title="Weekly Volatility", overlaying="y", side="right"),
+        barmode="group"
+    )
+
+    st.plotly_chart(fig_vol, use_container_width=True)
+
+
