@@ -35,14 +35,12 @@ st.markdown(
 st.markdown(
     """
     <div style="background-color: #ffc7aa; padding: 15px; border-radius: 10px; border: 1px solid #ffc7aa;">
-        Axelar emerges as the cutting-edge platform revolutionizing Web3 interoperability, poised to propel the next wave of internet applications to unparalleled heights, 
-        accommodating billions of users worldwide. With its innovative architecture and robust infrastructure, Axelar paves the way for seamless connectivity across diverse 
-        blockchain networks, facilitating frictionless data and asset transfer while ensuring utmost security and efficiency.
-        At its core, Axelar serves as the bridge between disparate blockchain ecosystems, enabling developers to harness the full potential of decentralized applications (dApps) 
-        without constraints. By offering a programmable framework, Axelar empowers developers to effortlessly integrate their applications with multiple blockchains, unlocking 
-        unprecedented scalability and accessibility on a global scale.
-        In a landscape where interoperability is paramount, Axelar stands as the beacon of innovation, driving forward the vision of a truly interconnected Web3 ecosystem. 
-        
+        Staking AXL involves locking up tokens to support the Axelar network’s security and decentralization. By delegating AXL to validators, 
+        stakers help validate transactions and secure cross-chain communication, earning rewards in return. Stakers earn rewards from network 
+        inflation and transaction fees, though rewards are subject to validator commissions. Rewards are distributed approximately every 
+        block (~5-6 seconds).
+
+        Staking AXL also grants token holders the ability to participate in network governance, influencing protocol upgrades and parameter changes.
 </div>
     """,
     unsafe_allow_html=True
