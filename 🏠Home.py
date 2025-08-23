@@ -39,7 +39,6 @@ st.markdown(
         stakers help validate transactions and secure cross-chain communication, earning rewards in return. Stakers earn rewards from network 
         inflation and transaction fees, though rewards are subject to validator commissions. Rewards are distributed approximately every 
         block (~5-6 seconds).
-
         Staking AXL also grants token holders the ability to participate in network governance, influencing protocol upgrades and parameter changes.
 </div>
     """,
