@@ -96,6 +96,7 @@ conn = snowflake.connector.connect(
 )
 
 # ---------- Query Snowflake ----------
+@st.cache_data
 query = """
 WITH staking_actions AS (
     SELECT
