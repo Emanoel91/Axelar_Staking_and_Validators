@@ -227,7 +227,7 @@ def load_commission_rates():
         GROUP BY VALIDATOR_ADDRESS, DELEGATOR_ADDRESS
     )
     SELECT  
-        v.label AS "Validator Name",
+        distinct v.label AS "Validator Name",
         v.rate * 100 AS "Commission Rate %"
     FROM Amount a
     JOIN axelar.gov.fact_validators v ON a.VALIDATOR_ADDRESS = v.ADDRESS
