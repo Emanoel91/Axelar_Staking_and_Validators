@@ -201,25 +201,24 @@ col1, col2, col3, col4 = st.columns(4)
 
 with col1:
     st.metric(
-        label="Unique Delegators (Wallets)",
-        value=f"{df_kpi['Unique Delegators'][0]/1000:.1f}k"
+        label="Unique Delegators",
+        value=f"{df_kpi['Unique Delegators'][0]/1000:.1f}k Wallets"
     )
 
 with col2:
     st.metric(
-        label="Staking Transactions (Txns)",
-        value=f"{df_kpi['Staking Transactions'][0]/1000:.1f}k"
+        label="Staking Transactions",
+        value=f"{df_kpi['Staking Transactions'][0]/1000:.1f}k Txns"
     )
 
 with col3:
     st.metric(
-        label="Avg Transaction per Delegator (Txns)",
-        value=f"{df_kpi['Avg Transaction per Delegator'][0]}"
+        label="Avg Transaction per Delegator",
+        value=f"{df_kpi['Avg Transaction per Delegator'][0]} Txns"
     )
 
 with col4:
     st.metric(
-        label="Unstake Waiting Period (Days)",
-        value=f"{df_kpi['Unstake Waiting Period'][0]}"
+        label="Unstake Waiting Period",
+        value=f"{df_kpi['Unstake Waiting Period'][0]} Days"
     )
-
