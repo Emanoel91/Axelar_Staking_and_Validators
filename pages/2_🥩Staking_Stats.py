@@ -170,3 +170,56 @@ with col4:
         label="% of Total Supply Staked",
         value=f"{percent_staked:.2f}%"
     )
+
+# --- Row 2 ----------------------------------------------------------------------------------------------------
+@st.cache_data
+def load_kpi_data():
+    query = """
+    WITH tab1 AS (
+        SELECT
+            count(distinct delegator_address) AS "Unique Delegators",
+            count(distinct tx_id) AS "Staking Transactions",
+            round(count(distinct tx_id)/count(distinct delegator_address)) as "Avg Transaction per Delegator"
+        FROM axelar.gov.fact_staking
+        WHERE action IN ('delegate') AND tx_succeeded = TRUE
+    ),
+    tab2 AS (
+        SELECT
+            round(AVG(DATEDIFF(day, block_timestamp, completion_time))) AS "Unstake Waiting Period"
+        FROM axelar.gov.fact_staking
+        WHERE action IN ('undelegate') AND tx_succeeded = TRUE
+        GROUP BY action
+    )
+    SELECT * FROM tab1 , tab2
+    """
+    return pd.read_sql(query, conn)
+
+df_kpi = load_kpi_data()
+
+# --- kpi in 1 row --------------------------------
+col1, col2, col3, col4 = st.columns(4)
+
+with col1:
+    st.metric(
+        label="Unique Delegators (Wallets)",
+        value=f"{df_kpi['Unique Delegators'][0]/1000:.1f}k"
+    )
+
+with col2:
+    st.metric(
+        label="Staking Transactions (Txns)",
+        value=f"{df_kpi['Staking Transactions'][0]/1000:.1f}k"
+    )
+
+with col3:
+    st.metric(
+        label="Avg Transaction per Delegator (Txns)",
+        value=f"{df_kpi['Avg Transaction per Delegator'][0]}"
+    )
+
+with col4:
+    st.metric(
+        label="Unstake Waiting Period (Days)",
+        value=f"{df_kpi['Unstake Waiting Period'][0]}"
+    )
+
