@@ -6,6 +6,7 @@ import plotly.express as px
 import plotly.graph_objects as go
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.backends import default_backend
+import requests
 
 # --- Page Config: Tab Title & Icon ---
 st.set_page_config(
@@ -94,12 +95,77 @@ conn = snowflake.connector.connect(
     schema=schema
 )
 
-# --- Date Inputs ---------------------------------------------------------------------------------------------------
-col1, col2, col3 = st.columns(3)
+# ---------- Query Snowflake ----------
+query = """
+WITH staking_actions AS (
+    SELECT
+        delegator_address,
+        validator_address,
+        action,
+        amount, CASE
+            WHEN action = 'delegate' THEN amount
+            WHEN action = 'undelegate' THEN -amount
+            ELSE 0
+        END AS net_amount
+    FROM
+        axelar.gov.fact_staking
+    WHERE
+        tx_succeeded = TRUE
+),
+
+net_staking AS (
+    SELECT
+        SUM(net_amount/1e6) AS total_staked
+    FROM
+        staking_actions
+)
+
+SELECT
+    ROUND(ns.total_staked) AS currently_staked_axl
+FROM
+    net_staking ns
+"""
+
+df = pd.read_sql(query, conn)
+currently_staked_axl = df["CURRENTLY_STAKED_AXL"].iloc[0]  # عدد AXL استیک شده
+
+# ---------- Call APIs ----------
+supply_url = "https://api.axelarscan.io/api/getTotalSupply"
+price_url = "https://api.axelarscan.io/api/getTokensPrice?symbol=AXL"
+
+total_supply = float(requests.get(supply_url).json()) / 1e6  # تبدیل به میلیون
+price_axl = requests.get(price_url).json()["AXL"]["price"]
+
+# ---------- KPIs ----------
+currently_staked_m = currently_staked_axl / 1e6  # به میلیون
+currently_staked_usd_m = (currently_staked_axl * price_axl) / 1e6
+percent_staked = (currently_staked_axl / (total_supply * 1e6)) * 100
+
+# ---------- Display in Streamlit ----------
+st.markdown("## 🔑 Key Metrics")
+
+col1, col2, col3, col4 = st.columns(4)
 
 with col1:
-    timeframe = st.selectbox("Select Time Frame", ["month", "week", "day"])
+    st.metric(
+        label="Currently Staked Amount",
+        value=f"{currently_staked_m:,.2f}m $AXL"
+    )
+
 with col2:
-    start_date = st.date_input("Start Date", value=pd.to_datetime("2025-01-01"))
+    st.metric(
+        label="Currently Staked Amount (USD)",
+        value=f"${currently_staked_usd_m:,.2f}m"
+    )
+
 with col3:
-    end_date = st.date_input("End Date", value=pd.to_datetime("2025-07-31"))
+    st.metric(
+        label="Currently Total Supply",
+        value=f"{total_supply:,.2f}m $AXL"
+    )
+
+with col4:
+    st.metric(
+        label="% of Total Supply Staked",
+        value=f"{percent_staked:.2f}%"
+    )
