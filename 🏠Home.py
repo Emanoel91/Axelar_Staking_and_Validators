@@ -2,8 +2,8 @@ import streamlit as st
 
 # --- Page Config: Tab Title & Icon ---
 st.set_page_config(
-    page_title="Axelar: An overview",
-    page_icon="https://img.cryptorank.io/coins/axelar1663924228506.png",
+    page_title="Axelar Staking and Validators",
+    page_icon="https://pbs.twimg.com/profile_images/1877235283755778048/4nlylmxm_400x400.jpg",
     layout="wide" 
 )
 
@@ -11,8 +11,8 @@ st.set_page_config(
 st.markdown(
     """
     <div style="display: flex; align-items: center; gap: 15px;">
-        <img src="https://img.cryptorank.io/coins/axelar1663924228506.png" alt="Axelar Logo" style="width:60px; height:60px;">
-        <h1 style="margin: 0;">Axelar: An overview</h1>
+        <img src="https://pbs.twimg.com/profile_images/1877235283755778048/4nlylmxm_400x400.jpg" alt="Axelar Logo" style="width:60px; height:60px;">
+        <h1 style="margin: 0;">Axelar Staking and Validators</h1>
     </div>
     """,
     unsafe_allow_html=True
