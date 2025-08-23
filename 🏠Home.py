@@ -34,7 +34,7 @@ st.markdown(
 # --- Info Box -----------------------------------------------------------------------------------------------------------------------------
 st.markdown(
     """
-    <div style="background-color: #ff6414; padding: 15px; border-radius: 10px; border: 1px solid #ff6414;">
+    <div style="background-color: #ffc7aa; padding: 15px; border-radius: 10px; border: 1px solid #ffc7aa;">
         Axelar emerges as the cutting-edge platform revolutionizing Web3 interoperability, poised to propel the next wave of internet applications to unparalleled heights, 
         accommodating billions of users worldwide. With its innovative architecture and robust infrastructure, Axelar paves the way for seamless connectivity across diverse 
         blockchain networks, facilitating frictionless data and asset transfer while ensuring utmost security and efficiency.
