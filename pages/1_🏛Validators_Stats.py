@@ -17,7 +17,6 @@ st.set_page_config(
 st.title("🏛Validators Stats")
 
 # --- attention ---------------------------------------------------------------------------------------------------------
-st.info("📊Charts initially display data for a default time range. Select a custom range to view results for your desired period.")
 st.info("⏳On-chain data retrieval may take a few moments. Please wait while the results load.")
 
 # --- Sidebar Footer Slightly Left-Aligned ---
@@ -95,8 +94,8 @@ conn = snowflake.connector.connect(
 )
 
 # --- Queries with st.cache_data --------------------------------------------------------------------------------
-
-@st.cache_data(ttl=600)
+# --- Row 1 -----------------------------------------------------------------------------------------------------
+@st.cache_data
 def load_kpi_data():
     query = """
     SELECT 
@@ -107,6 +106,18 @@ def load_kpi_data():
     """
     return pd.read_sql(query, conn)
 
+# --- KPI Section 1 --------------------------------------------------------------------------------
+kpi_df = load_kpi_data()
+col1, col2, col3 = st.columns(3)
+
+with col1:
+    st.metric("Total Number of Validators", int(kpi_df["Total Validators"].iloc[0]))
+with col2:
+    st.metric("Number of Active Validators", int(kpi_df["Active Validators"].iloc[0]))
+with col3:
+    st.metric("Total Delegator Shares", f"{kpi_df['Total Delegator Shares'].iloc[0]} $AXL")
+
+# --- Row 2 -----------------------------------------------------------------------------------------------------------------
 @st.cache_data(ttl=600)
 def load_validators_amounts():
     query = """
@@ -157,6 +168,31 @@ def load_validators_amounts():
     """
     return pd.read_sql(query, conn)
 
+# --- Charts Section 1: Delegated Amount & Unique Delegators ----------------------------------------
+validators_df = load_validators_amounts()
+col1, col2 = st.columns(2)
+
+with col1:
+    fig1 = px.bar(
+        validators_df.sort_values("Total Delegated Amount (AXL)", ascending=True),
+        x="Total Delegated Amount (AXL)",
+        y="Validator Name",
+        orientation="h",
+        title="Top Active Validators by Delegated Amount"
+    )
+    st.plotly_chart(fig1, use_container_width=True)
+
+with col2:
+    fig2 = px.bar(
+        validators_df.sort_values("Unique Delegators", ascending=True),
+        x="Unique Delegators",
+        y="Validator Name",
+        orientation="h",
+        title="Top Active Validators by No. of Unique Delegators"
+    )
+    st.plotly_chart(fig2, use_container_width=True)
+
+# --- Row 3 -------------------------------------------------------------------------------------------------------------------
 @st.cache_data(ttl=600)
 def load_commission_stats():
     query = """
@@ -174,6 +210,21 @@ def load_commission_stats():
     """
     return pd.read_sql(query, conn)
 
+# --- KPI Section 2: Commission Stats ---------------------------------------------------------------
+commission_df = load_commission_stats()
+col1, col2, col3, col4 = st.columns(4)
+
+with col1:
+    st.metric("Max Commission Rate", f"{commission_df['Maximum Commission Rate'].iloc[0]} %")
+with col2:
+    st.metric("Avg Commission Rate", f"{commission_df['Average Commission Rate'].iloc[0]} %")
+with col3:
+    st.metric("Total Commision Amount Claimed", f"{commission_df['Total Commission Amount'].iloc[0]} $AXL")
+with col4:
+    st.metric("Average Commision Claimed", f"{commission_df['Average Commission Amount'].iloc[0]} $AXL")
+
+
+# --- Row 4 ----------------------------------------------------------------------------------
 @st.cache_data(ttl=600)
 def load_commission_claimed():
     query = """
@@ -236,58 +287,6 @@ def load_commission_rates():
     LIMIT 75
     """
     return pd.read_sql(query, conn)
-
-
-# --- KPI Section 1 --------------------------------------------------------------------------------
-kpi_df = load_kpi_data()
-col1, col2, col3 = st.columns(3)
-
-with col1:
-    st.metric("Total Number of Validators", int(kpi_df["Total Validators"].iloc[0]))
-with col2:
-    st.metric("Number of Active Validators", int(kpi_df["Active Validators"].iloc[0]))
-with col3:
-    st.metric("Total Delegator Shares", f"{kpi_df['Total Delegator Shares'].iloc[0]} $AXL")
-
-
-# --- Charts Section 1: Delegated Amount & Unique Delegators ----------------------------------------
-validators_df = load_validators_amounts()
-col1, col2 = st.columns(2)
-
-with col1:
-    fig1 = px.bar(
-        validators_df.sort_values("Total Delegated Amount (AXL)", ascending=True),
-        x="Total Delegated Amount (AXL)",
-        y="Validator Name",
-        orientation="h",
-        title="Top Active Validators by Delegated Amount"
-    )
-    st.plotly_chart(fig1, use_container_width=True)
-
-with col2:
-    fig2 = px.bar(
-        validators_df.sort_values("Unique Delegators", ascending=True),
-        x="Unique Delegators",
-        y="Validator Name",
-        orientation="h",
-        title="Top Active Validators by No. of Unique Delegators"
-    )
-    st.plotly_chart(fig2, use_container_width=True)
-
-
-# --- KPI Section 2: Commission Stats ---------------------------------------------------------------
-commission_df = load_commission_stats()
-col1, col2, col3, col4 = st.columns(4)
-
-with col1:
-    st.metric("Max Commission Rate", f"{commission_df['Maximum Commission Rate'].iloc[0]} %")
-with col2:
-    st.metric("Avg Commission Rate", f"{commission_df['Average Commission Rate'].iloc[0]} %")
-with col3:
-    st.metric("Total Commision Amount Claimed", f"{commission_df['Total Commission Amount'].iloc[0]} $AXL")
-with col4:
-    st.metric("Average Commision Claimed", f"{commission_df['Average Commission Amount'].iloc[0]} $AXL")
-
 
 # --- Charts Section 2: Commission Claimed & Commission Rate ----------------------------------------
 commission_claimed_df = load_commission_claimed()
