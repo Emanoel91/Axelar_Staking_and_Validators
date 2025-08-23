@@ -143,7 +143,6 @@ currently_staked_usd_m = (currently_staked_axl * price_axl) / 1e6
 percent_staked = (currently_staked_axl / (total_supply * 1e6)) * 100
 
 # ---------- Display in Streamlit ----------
-st.markdown("## 🔑 Key Metrics")
 
 col1, col2, col3, col4 = st.columns(4)
 
