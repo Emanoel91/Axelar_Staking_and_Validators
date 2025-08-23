@@ -220,3 +220,51 @@ with col4:
         label="Unstake Waiting Period",
         value=f"{df_kpi['Unstake Waiting Period'][0]} Days"
     )
+
+# --- Row 3: Action Over Time -------------------------------------------------------------------------------------
+@st.cache_data
+def load_action_data():
+    query = """
+    SELECT
+        DATE_TRUNC('month', block_timestamp) AS "Date",
+        action as "Action",
+        round(sum(amount/1e6)) as "Volume (AXL)",
+        count(distinct tx_id) as "Transactions"
+    FROM axelar.gov.fact_staking
+    WHERE tx_succeeded = TRUE 
+      AND action IN ('delegate', 'undelegate', 'redelegate')
+      AND block_timestamp::date >= '2022-09-01'
+    GROUP BY 1, 2
+    ORDER BY 1
+    """
+    return pd.read_sql(query, conn)
+
+df_actions = load_action_data()
+
+# --- نمایش دو نمودار در یک ردیف ---
+col1, col2 = st.columns(2)
+
+with col1:
+    fig_vol = px.bar(
+        df_actions,
+        x="Date",
+        y="Volume (AXL)",
+        color="Action",
+        barmode="stack",
+        title="Action Volume Over Time (AXL)"
+    )
+    fig_vol.update_layout(xaxis_title="Date", yaxis_title="Volume (AXL)")
+    st.plotly_chart(fig_vol, use_container_width=True)
+
+with col2:
+    fig_tx = px.bar(
+        df_actions,
+        x="Date",
+        y="Transactions",
+        color="Action",
+        barmode="stack",
+        title="Action Count Over Time"
+    )
+    fig_tx.update_layout(xaxis_title="Date", yaxis_title="Transactions")
+    st.plotly_chart(fig_tx, use_container_width=True)
+
