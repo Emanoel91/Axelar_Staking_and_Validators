@@ -133,7 +133,7 @@ currently_staked_axl = df["CURRENTLY_STAKED_AXL"].iloc[0]
 supply_url = "https://api.axelarscan.io/api/getTotalSupply"
 price_url = "https://api.axelarscan.io/api/getTokensPrice?symbol=AXL"
 
-total_supply = float(requests.get(supply_url).json()) / 1e9  
+total_supply = float(requests.get(supply_url).json()) / 1e6 
 price_axl = requests.get(price_url).json()["AXL"]["price"]
 
 # ---------- KPIs ----------
