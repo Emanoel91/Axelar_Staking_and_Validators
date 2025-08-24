@@ -95,7 +95,7 @@ conn = snowflake.connector.connect(
 
 # ----------------------- KPI Row -------------------------------------------------------------
 @st.cache_data
-def load_kpi_data(conn):
+def load_kpi_data(_conn):
     query = """
     WITH table1 AS (
         SELECT 
@@ -126,9 +126,9 @@ def load_kpi_data(conn):
     )
     SELECT * FROM table1, table2
     """
-    return pd.read_sql(query, conn)
+    return pd.read_sql(query, _conn)
 
-df_kpi = load_kpi_data(conn)
+df_kpi = load_kpi_data(_conn)
 
 col1, col2, col3, col4 = st.columns(4)
 
@@ -159,7 +159,7 @@ with col4:
 
 # ----------------------- Time Series Charts --------------------------------------------------
 @st.cache_data
-def load_timeseries_data(conn):
+def load_timeseries_data(_conn):
     query = """
     SELECT 
         DATE_TRUNC('month',block_timestamp) AS "Date",
@@ -173,9 +173,9 @@ def load_timeseries_data(conn):
     GROUP BY 1
     ORDER BY 1
     """
-    return pd.read_sql(query, conn)
+    return pd.read_sql(query, _conn)
 
-df_ts = load_timeseries_data(conn)
+df_ts = load_timeseries_data(_conn)
 
 col5, col6 = st.columns(2)
 
@@ -206,7 +206,7 @@ with col6:
 
 # ----------------------- Validators Table ----------------------------------------------------
 @st.cache_data
-def load_validators_data(conn):
+def load_validators_data(_conn):
     query = """
     SELECT
         b.label AS "Validator Name",
@@ -219,9 +219,9 @@ def load_validators_data(conn):
     ORDER BY "Total Rewards Distributed (AXL)" DESC
     LIMIT 75
     """
-    return pd.read_sql(query, conn)
+    return pd.read_sql(query, _conn)
 
-df_val = load_validators_data(conn)
+df_val = load_validators_data(_conn)
 df_val.index = df_val.index + 1  
 df_val["Total Rewards Distributed (AXL)"] = df_val["Total Rewards Distributed (AXL)"].apply(lambda x: f"{x:,.0f}")
 
