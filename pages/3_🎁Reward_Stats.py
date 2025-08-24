@@ -133,26 +133,26 @@ col1, col2, col3, col4 = st.columns(4)
 
 with col1:
     st.metric(
-        label="Unique Reward Claimers (Wallets)",
-        value=f"{df_kpi['Reward Claimers'][0]/1000:.1f}k"
+        label="Unique Reward Claimers",
+        value=f"{df_kpi['Reward Claimers'][0]/1000:.1f}k Wallets"
     )
 
 with col2:
     st.metric(
-        label="Claim TXs Count (Txns)",
-        value=f"{df_kpi['Claim TXs Count'][0]/1000:.1f}k"
+        label="Claim TXs Count",
+        value=f"{df_kpi['Claim TXs Count'][0]/1000:.1f}k Txns"
     )
 
 with col3:
     st.metric(
-        label="Amount of Reward Claimed ($AXL)",
-        value=f"{df_kpi['Reward Claimed'][0]/1_000_000:.1f}m"
+        label="Amount of Reward Claimed",
+        value=f"{df_kpi['Reward Claimed'][0]/1_000_000:.1f}m $AXL"
     )
 
 with col4:
     st.metric(
-        label="Avg Time Between Transactions (Days)",
-        value=f"{df_kpi['Avg Time Between Transactions Days'][0]} days"
+        label="Avg Time Between Transactions",
+        value=f"{df_kpi['Avg Time Between Transactions Days'][0]} Days"
     )
 
 # ----------------------- Time Series Charts --------------------------------------------------
