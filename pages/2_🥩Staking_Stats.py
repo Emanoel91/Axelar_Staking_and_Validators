@@ -394,4 +394,45 @@ with col2:
 
     st.plotly_chart(fig_vol, use_container_width=True)
 
+# --- Row 5: Donut Charts by Action -------------------------------------------------------------------------------
+@st.cache_data
+def load_action_summary():
+    query = """
+    SELECT
+        action,
+        COUNT(distinct tx_id) AS "Action Count",
+        round(sum(amount)/pow(10,6)) as "Action Amount (AXL)" 
+    FROM axelar.gov.fact_staking
+    WHERE tx_succeeded = TRUE
+    GROUP BY 1
+    ORDER BY 2 desc
+    """
+    return pd.read_sql(query, conn)
+
+df_action_summary = load_action_summary()
+
+# --- Layout: Two Donut Charts in One Row ---
+col1, col2 = st.columns(2)
+
+with col1:
+    fig_count = px.pie(
+        df_action_summary,
+        names="ACTION",
+        values="Action Count",
+        hole=0.5,
+        title="Number of Transactions by Action"
+    )
+    fig_count.update_traces(textinfo="percent+label")
+    st.plotly_chart(fig_count, use_container_width=True)
+
+with col2:
+    fig_amount = px.pie(
+        df_action_summary,
+        names="ACTION",
+        values="Action Amount (AXL)",
+        hole=0.5,
+        title="Volume of Transactions by Action (AXL)"
+    )
+    fig_amount.update_traces(textinfo="percent+label")
+    st.plotly_chart(fig_amount, use_container_width=True)
 
