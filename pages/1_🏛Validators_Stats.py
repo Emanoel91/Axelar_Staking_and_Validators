@@ -220,9 +220,10 @@ with col1:
 with col2:
     st.metric("Avg Commission Rate", f"{commission_df['Average Commission Rate'].iloc[0]} %")
 with col3:
-    st.metric("Total Commision Amount Claimed", f"{commission_df['Total Commission Amount'].iloc[0]} $AXL")
+    total_commission_m = commission_df["Total Commission Amount"].iloc[0] / 1_000_000
+    st.metric("Total Commission Amount Claimed", f"{total_commission_m:,.1f}m $AXL")
 with col4:
-    st.metric("Average Commision Claimed", f"{commission_df['Average Commission Amount'].iloc[0]} $AXL")
+    st.metric("Average Commission Claimed", f"{commission_df['Average Commission Amount'].iloc[0]} $AXL")
 
 
 # --- Row 4 ----------------------------------------------------------------------------------
