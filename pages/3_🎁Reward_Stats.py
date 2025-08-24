@@ -184,8 +184,8 @@ with col5:
                               mode="lines+markers", name="Total Reward Claimed (AXL)", yaxis="y2"))
     fig1.update_layout(
         title="Amount of Reward Claimed Over Time",
-        yaxis=dict(title="Reward Claimed (AXL)"),
-        yaxis2=dict(title="Total Reward Claimed (AXL)", overlaying="y", side="right")
+        yaxis=dict(title="$AXL"),
+        yaxis2=dict(title="$AXL", overlaying="y", side="right")
     )
     st.plotly_chart(fig1, use_container_width=True)
 
@@ -196,8 +196,8 @@ with col6:
                               mode="lines+markers", name="Reward Claimers", yaxis="y2"))
     fig2.update_layout(
         title="Number of Claim Txns & Reward Claimers Over Time",
-        yaxis=dict(title="Claim TXs Count"),
-        yaxis2=dict(title="Reward Claimers", overlaying="y", side="right")
+        yaxis=dict(title="Txns Count"),
+        yaxis2=dict(title="Wallet count", overlaying="y", side="right")
     )
     st.plotly_chart(fig2, use_container_width=True)
 
