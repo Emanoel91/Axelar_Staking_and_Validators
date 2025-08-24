@@ -436,3 +436,100 @@ with col2:
     fig_amount.update_traces(textinfo="percent+label")
     st.plotly_chart(fig_amount, use_container_width=True)
 
+# --- Row 6: Delegator Metrics Table ------------------------------------------------------------------------------
+
+@st.cache_data(ttl=3600)
+def load_delegator_data():
+    query = """
+    WITH delegator_metrics AS (
+        SELECT
+            delegator_address,
+            SUM(CASE WHEN action = 'delegate' AND tx_succeeded = TRUE THEN amount/1e6 ELSE 0 END) AS total_staked_amount,
+            SUM(CASE WHEN action = 'undelegate' AND tx_succeeded = TRUE THEN -amount/1e6 ELSE 0 END) AS total_undelegated_amount,
+            SUM(CASE WHEN action = 'redelegate' AND tx_succeeded = TRUE THEN amount/1e6 ELSE 0 END) AS total_redelegated_amount,
+            COUNT(*) AS total_transactions,
+            COUNT(DISTINCT validator_address) AS unique_validators
+        FROM axelar.gov.fact_staking
+        GROUP BY delegator_address
+    ),
+    net_staked AS (
+        SELECT
+            delegator_address,
+            total_staked_amount + total_undelegated_amount AS net_staked_amount
+        FROM delegator_metrics
+    ),
+    total_net_staked AS (
+        SELECT
+            SUM(net_staked_amount) AS total_net_staked_amount
+        FROM net_staked
+    ),
+    average_transactions AS (
+        SELECT
+            AVG(total_transactions) AS avg_transactions_per_delegator
+        FROM delegator_metrics
+    )
+    SELECT
+        dm.delegator_address as "Delegator",
+        round(dm.total_staked_amount) as "Total Staked Amount (AXL)",
+        round(dm.total_undelegated_amount) as "Total Unstaked Amount (AXL)",
+        round(dm.total_redelegated_amount) as "Total Redelegated Amount (AXL)",
+        dm.total_transactions as "Total Transactions",
+        dm.unique_validators as "Unique Validators",
+        round(ns.net_staked_amount) as "Current Staked Amount",
+        round(((ns.net_staked_amount / tns.total_net_staked_amount) * 100),3) || '%' AS "Percentage Of Total Net Staked",
+        round(at.avg_transactions_per_delegator) as "Avg Txn Count per Delegator"
+    FROM delegator_metrics dm
+    JOIN net_staked ns ON dm.delegator_address = ns.delegator_address
+    JOIN total_net_staked tns,
+         average_transactions at
+    ORDER BY 7 DESC
+    LIMIT 1000
+    """
+    return pd.read_sql(query, conn)
+
+df_delegators = load_delegator_data()
+
+# --- KPI Calculation ---
+top10 = df_delegators.head(10).copy()
+
+# Current Staked Amount (top 10)
+kpi1_value = top10["Current Staked Amount"].sum()
+
+# Percentage of Total Net Staked (top 10)
+
+top10["Percentage_float"] = top10["Percentage Of Total Net Staked"].str.replace("%", "").astype(float)
+kpi2_value = top10["Percentage_float"].sum()
+
+# --- KPI Display ---
+col1, col2 = st.columns(2)
+
+with col1:
+    st.metric(
+        label="Total AXL Tokens Staked by the Top 10 Delegators",
+        value=f"{kpi1_value:,.0f} AXL"
+    )
+
+with col2:
+    st.metric(
+        label="Top 10 Delegators’ Share of Total Staked AXL Tokens",
+        value=f"{kpi2_value:.2f}%"
+    )
+
+# --- Table Formatting ---
+df_display = df_delegators.copy()
+
+numeric_cols = [
+    "Total Staked Amount (AXL)",
+    "Total Unstaked Amount (AXL)",
+    "Total Redelegated Amount (AXL)",
+    "Total Transactions",
+    "Unique Validators",
+    "Current Staked Amount",
+    "Avg Txn Count per Delegator"
+]
+for col in numeric_cols:
+    df_display[col] = df_display[col].apply(lambda x: f"{x:,.0f}")
+
+df_display.index = df_display.index + 1
+
+st.dataframe(df_display, use_container_width=True)
