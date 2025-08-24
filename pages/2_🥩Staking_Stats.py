@@ -127,17 +127,17 @@ FROM
 """
 
 df = pd.read_sql(query, conn)
-currently_staked_axl = df["CURRENTLY_STAKED_AXL"].iloc[0]  # عدد AXL استیک شده
+currently_staked_axl = df["CURRENTLY_STAKED_AXL"].iloc[0]  
 
 # ---------- Call APIs ----------
 supply_url = "https://api.axelarscan.io/api/getTotalSupply"
 price_url = "https://api.axelarscan.io/api/getTokensPrice?symbol=AXL"
 
-total_supply = float(requests.get(supply_url).json()) / 1e6  # تبدیل به میلیون
+total_supply = float(requests.get(supply_url).json()) / 1e9  
 price_axl = requests.get(price_url).json()["AXL"]["price"]
 
 # ---------- KPIs ----------
-currently_staked_m = currently_staked_axl / 1e6  # به میلیون
+currently_staked_m = currently_staked_axl / 1e6  
 currently_staked_usd_m = (currently_staked_axl * price_axl) / 1e6
 percent_staked = (currently_staked_axl / (total_supply * 1e6)) * 100
 
@@ -241,7 +241,6 @@ def load_action_data():
 
 df_actions = load_action_data()
 
-# --- نمایش دو نمودار در یک ردیف ---
 col1, col2 = st.columns(2)
 
 with col1:
