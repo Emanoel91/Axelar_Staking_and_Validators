@@ -252,7 +252,7 @@ with col1:
         barmode="stack",
         title="Action Volume Over Time (AXL)"
     )
-    fig_vol.update_layout(xaxis_title="Date", yaxis_title="Volume (AXL)")
+    fig_vol.update_layout(xaxis_title=" ", yaxis_title="$AXL")
     st.plotly_chart(fig_vol, use_container_width=True)
 
 with col2:
@@ -264,7 +264,7 @@ with col2:
         barmode="stack",
         title="Action Count Over Time"
     )
-    fig_tx.update_layout(xaxis_title="Date", yaxis_title="Transactions")
+    fig_tx.update_layout(xaxis_title=" ", yaxis_title="Txns count")
     st.plotly_chart(fig_tx, use_container_width=True)
 
 # --- Row 4: New vs Returning Stakers + Weekly Volatility ---------------------------------------------------------
@@ -353,7 +353,7 @@ with col1:
             "New Staker": "green"
         }
     )
-    fig_stakers.update_layout(xaxis_title="Date", yaxis_title="Staker Count")
+    fig_stakers.update_layout(xaxis_title=" ", yaxis_title="Wallet count")
     st.plotly_chart(fig_stakers, use_container_width=True)
 
 # --- Chart 2: Weekly Volatility of Staking Amounts
@@ -385,9 +385,9 @@ with col2:
     # Layout with dual y-axes
     fig_vol.update_layout(
         title="Weekly Volatility of Staking Amounts",
-        xaxis=dict(title="Date"),
-        yaxis=dict(title="Total Staked Amount (AXL)", side="left"),
-        yaxis2=dict(title="Weekly Volatility", overlaying="y", side="right"),
+        xaxis=dict(title=" "),
+        yaxis=dict(title="$AXL", side="left"),
+        yaxis2=dict(title="Volatility", overlaying="y", side="right"),
         barmode="group"
     )
 
