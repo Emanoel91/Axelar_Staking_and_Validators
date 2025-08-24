@@ -17,7 +17,6 @@ st.set_page_config(
 st.title("🎁Reward Stats")
 
 # --- attention ---------------------------------------------------------------------------------------------------------
-st.info("📊Charts initially display data for a default time range. Select a custom range to view results for your desired period.")
 st.info("⏳On-chain data retrieval may take a few moments. Please wait while the results load.")
 
 # --- Sidebar Footer Slightly Left-Aligned ---
@@ -93,13 +92,3 @@ conn = snowflake.connector.connect(
     database=database,
     schema=schema
 )
-
-# --- Date Inputs ---------------------------------------------------------------------------------------------------
-col1, col2, col3 = st.columns(3)
-
-with col1:
-    timeframe = st.selectbox("Select Time Frame", ["month", "week", "day"])
-with col2:
-    start_date = st.date_input("Start Date", value=pd.to_datetime("2025-01-01"))
-with col3:
-    end_date = st.date_input("End Date", value=pd.to_datetime("2025-07-31"))
