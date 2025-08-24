@@ -114,11 +114,9 @@ with col1:
     st.metric("Total Number of Validators", int(kpi_df["Total Validators"].iloc[0]))
 with col2:
     st.metric("Number of Active Validators", int(kpi_df["Active Validators"].iloc[0]))
-# -- with col3:
-# --    st.metric("Total Delegator Shares", f"{kpi_df['Total Delegator Shares'].iloc[0]} $AXL")
-
 with col3:
-    st.metric(label="Total Delegator Shares",value=f"{df_kpi['Total Delegator Shares'][0]/1_000_000:.1f}m $AXL")
+    total_shares_m = kpi_df["Total Delegator Shares"].iloc[0] / 1_000_000
+    st.metric("Total Delegator Shares", f"{total_shares_m:,.1f}m $AXL")
 
 # --- Row 2 -----------------------------------------------------------------------------------------------------------------
 @st.cache_data(ttl=600)
