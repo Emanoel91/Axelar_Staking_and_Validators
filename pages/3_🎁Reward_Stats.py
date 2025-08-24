@@ -2,8 +2,6 @@ import streamlit as st
 import pandas as pd
 import snowflake.connector
 import plotly.graph_objects as go
-import plotly.express as px
-import plotly.graph_objects as go
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.backends import default_backend
 
@@ -13,13 +11,14 @@ st.set_page_config(
     page_icon="https://pbs.twimg.com/profile_images/1877235283755778048/4nlylmxm_400x400.jpg",
     layout="wide" 
 )
-# --- Title  -----------------------------------------------------------------------------------------------------
+
+# --- Title -----------------------------------------------------------------------------------------------------
 st.title("🎁Reward Stats")
 
-# --- attention ---------------------------------------------------------------------------------------------------------
+# --- attention -------------------------------------------------------------------------------------------------
 st.info("⏳On-chain data retrieval may take a few moments. Please wait while the results load.")
 
-# --- Sidebar Footer Slightly Left-Aligned ---
+# --- Sidebar Footer Slightly Left-Aligned ----------------------------------------------------------------------
 st.sidebar.markdown(
     """
     <style>
@@ -63,7 +62,7 @@ st.sidebar.markdown(
     unsafe_allow_html=True
 )
 
-# --- Snowflake Connection ----------------------------------------------------------------------------------------
+# --- Snowflake Connection --------------------------------------------------------------------------------------
 snowflake_secrets = st.secrets["snowflake"]
 user = snowflake_secrets["user"]
 account = snowflake_secrets["account"]
@@ -128,7 +127,7 @@ def load_kpi_data(_conn):
     """
     return pd.read_sql(query, _conn)
 
-df_kpi = load_kpi_data(_conn)
+df_kpi = load_kpi_data(conn)
 
 col1, col2, col3, col4 = st.columns(4)
 
@@ -156,7 +155,6 @@ with col4:
         value=f"{df_kpi['Avg Time Between Transactions Days'][0]} days"
     )
 
-
 # ----------------------- Time Series Charts --------------------------------------------------
 @st.cache_data
 def load_timeseries_data(_conn):
@@ -175,7 +173,7 @@ def load_timeseries_data(_conn):
     """
     return pd.read_sql(query, _conn)
 
-df_ts = load_timeseries_data(_conn)
+df_ts = load_timeseries_data(conn)
 
 col5, col6 = st.columns(2)
 
@@ -203,7 +201,6 @@ with col6:
     )
     st.plotly_chart(fig2, use_container_width=True)
 
-
 # ----------------------- Validators Table ----------------------------------------------------
 @st.cache_data
 def load_validators_data(_conn):
@@ -221,7 +218,7 @@ def load_validators_data(_conn):
     """
     return pd.read_sql(query, _conn)
 
-df_val = load_validators_data(_conn)
+df_val = load_validators_data(conn)
 df_val.index = df_val.index + 1  
 df_val["Total Rewards Distributed (AXL)"] = df_val["Total Rewards Distributed (AXL)"].apply(lambda x: f"{x:,.0f}")
 
