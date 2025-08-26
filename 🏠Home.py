@@ -12,7 +12,7 @@ st.markdown(
     """
     <div style="display: flex; align-items: center; gap: 15px;">
         <img src="https://pbs.twimg.com/profile_images/1877235283755778048/4nlylmxm_400x400.jpg" alt="Axelar Logo" style="width:60px; height:60px;">
-        <h1 style="margin: 0;">Axelar Staking and Validators000</h1>
+        <h1 style="margin: 0;">Axelar Staking and Validators</h1>
     </div>
     """,
     unsafe_allow_html=True
