@@ -14,7 +14,7 @@ st.set_page_config(
     layout="wide" 
 )
 # --- Title  -----------------------------------------------------------------------------------------------------
-st.title("🏛Validators Stats")
+st.title("🏛Validators Stats0000000")
 
 # --- attention ---------------------------------------------------------------------------------------------------------
 st.info("⏳On-chain data retrieval may take a few moments. Please wait while the results load.")
